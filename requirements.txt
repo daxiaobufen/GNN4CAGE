@@ -1,0 +1,18 @@
+# Install with:
+#   D:/CSD/ccdc-software/csd-python-api/miniconda/python.exe -m pip install -r requirements.txt
+
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.13.1
+scikit-learn==1.5.2
+matplotlib==3.9.4
+tqdm==4.67.1
+ase==3.27.0
+torch==2.8.0+cu126
+torch-geometric==2.7.0
+ipykernel==7.1.0
+openTSNE==1.0.4
+
+# NOTE:
+# 1) csd_extractor.py requires CCDC Python API (package 'ccdc'), provided by CSD installation, not pip.
+# 2) If torch-geometric wheel resolution fails on another machine, install a compatible wheel matching torch/cuda.
