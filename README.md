@@ -22,7 +22,8 @@ This repository covers the GNN workflow only. It does not include external basel
 - `configs/config.json`: Runtime configuration with numeric hyperparameters and desensitized paths.
 - `docs/script_reference.md`: Script I/O and usage summary.
 - `docs/dataset_format.md`: Expected CSV and XYZ formats for training and inference.
-- `mcd_master_index.csv`: Master database list (final index table of all records).
+- `MCD_full_version_20260605.csv`: Public full-database release file for the complete MCD collection.
+- `training_data_01.csv`: Public training dataset used in this study (7,749 structures; 2 columns: `Refcode`, `Label`; no header).
 
 ## Quick Start
 
@@ -32,7 +33,10 @@ Runtime prerequisite:
 
 1. Fill local path placeholders in `configs/config.json`.
 2. Prepare training dataset files according to `docs/dataset_format.md`.
-   - Training label CSV is manually curated and provided by users.
+   - The repository includes `training_data_01.csv` at the repository root and a working copy at `data/labels/training_data_01.csv`.
+   - The default working training label CSV is `data/labels/training_data_01.csv`.
+   - `training_data_01.csv` contains 7,749 structures, uses no header, and includes two columns: `Refcode` and `Label`.
+   - In this released training set, all macrocyclic and cage structures are uniformly labeled as `1`.
    - Global inference refcode CSV is manually provided, one column, no header.
 3. Run extraction:
 
@@ -63,26 +67,28 @@ python scripts/tsne_pipeline.py
 7. (Optional) Run labeled evaluation:
 
 ```bash
-python scripts/dimenet_inference.py --mode eval --label-mode mcd_012
+python scripts/dimenet_inference.py --mode eval --label-csv data/labels/training_data_01.csv --label-mode auto
 ```
 
 ## Current Repository Structure
 
 ```text
 <repo-root>/
-├─ mcd_master_index.csv
+├─ LICENSE
 ├─ README.md
-├─ README_zh.md
 ├─ RELEASE_PACKAGE_MANIFEST.md
+├─ SECURITY.md
+├─ MCD_full_version_20260605.csv
+├─ training_data_01.csv
 ├─ requirements.txt
 ├─ configs/
 │  └─ config.json
+├─ data/
+│  └─ labels/
+│     └─ training_data_01.csv
 ├─ docs/
 │  ├─ dataset_format.md
-│  ├─ dataset_format_zh.md
-│  ├─ script_reference.md
-│  ├─ script_reference_zh.md
-│  └─ release_checklist.md
+│  └─ script_reference.md
 └─ scripts/
    ├─ csd_extractor.py
    ├─ train_dimenet_schnet.ipynb
@@ -96,7 +102,9 @@ Included:
 - workflow scripts under `scripts/`
 - runtime config under `configs/config.json`
 - core docs under `docs/`
-- master list `mcd_master_index.csv`
+- public full-database file `MCD_full_version_20260605.csv`
+- public training dataset `training_data_01.csv`
+- working training label CSV `data/labels/training_data_01.csv`
 
 Not included:
 - `workspace/`
@@ -110,7 +118,7 @@ Use one project root folder (for example `workspace/`) and keep scripts under `s
 
 ```text
 workspace/
-├─ mcd_master_index.csv
+├─ MCD_full_version_20260605.csv
 ├─ configs/
 │  └─ config.json
 ├─ scripts/
@@ -123,7 +131,7 @@ workspace/
 │  └─ dataset_format.md
 ├─ data/
 │  ├─ labels/
-│  │  └─ labels_master_mcd.csv
+│  │  └─ training_data_01.csv
 │  ├─ inference/                     # optional staging area
 │  │  └─ refcodes_for_infer.csv      # one column, no header
 │  └─ extracted/
@@ -154,11 +162,11 @@ workspace/
 
 - `paths.data_root` -> `workspace/data/extracted` or your chosen base path
 - `paths.xyz_dir` -> `workspace/data/extracted/CSD_Molecule`
-- `paths.label_csv` -> `workspace/data/labels/labels_master_mcd.csv`
+- `paths.label_csv` -> `workspace/data/labels/training_data_01.csv`
 - `paths.inference_csv` -> `workspace/outputs/inference/DNNetBatchPredictions.csv`
 - `paths.dimenet_weights` -> `workspace/models/best_DimeNetplus.pth`
 - `paths.output_root` -> `workspace/outputs`
-- `mcd_master_index.csv` can be used by downstream selection or split scripts
+- `MCD_full_version_20260605.csv` can be used by downstream selection or split scripts
 
 ### Usage Notes
 
@@ -167,7 +175,8 @@ workspace/
 - Keep machine-specific paths only in config; do not hardcode them into scripts.
 - The training notebook reads label CSV + XYZ files; make sure those two paths are valid before training.
 - Keep one canonical XYZ folder for training/inference/t-SNE: `workspace/data/extracted/CSD_Molecule`.
-- Keep the training label CSV as a manually curated file.
+- Use `data/labels/training_data_01.csv` as the default working training label CSV.
+- Keep the repository-root `training_data_01.csv` as a public release copy of the same dataset.
 - Use a one-column, no-header refcode CSV as global inference input.
 - Use the inference output file referenced by `paths.inference_csv` as the t-SNE input.
 - Recommended t-SNE input file: `workspace/outputs/inference/DNNetBatchPredictions.csv`
@@ -179,21 +188,24 @@ workspace/
 - DimeNet++ model parameters in `build_model(...)` are read from `configs/config.json` and should match checkpoint architecture.
 - Keep all machine-specific paths in config only.
 
-### Label Mapping for Binary Training
+### Label Definition for Released Training Dataset
 
-Raw CSV labels:
+`training_data_01.csv` is a binary training dataset with no header and two columns: `Refcode`, `Label`.
+
+`MCD_full_version_20260605.csv` is the released full-database file for the complete MCD collection. When label annotations are present in this file, they follow the full-database convention: `0` = non-target, `1` = macrocycle, `2` = cage.
+
+Released label definition:
 - 0: negative
-- 1: macrocycle
-- 2: porous cage
+- 1: positive
 
-Binary training mapping:
-- 0 -> 0
-- 1 -> 1
-- 2 -> 1
+In this released dataset, all macrocyclic and cage structures are uniformly assigned the label `1`.
 
-This same mapping is used in:
-- `scripts/dimenet_inference.py` (`--label-mode mcd_012`)
-- `scripts/tsne_pipeline.py` for `Predicted_Class` normalization
+Dataset summary:
+- total structures: 7,749
+- label 0: 3,858
+- label 1: 3,891
+
+For evaluation with this file, `scripts/dimenet_inference.py` should use `--label-mode auto` (or `zero_one`).
 
 ## Privacy
 
@@ -203,4 +215,4 @@ Use placeholders for public examples (`<DATA_ROOT>`, `<MODEL_ROOT>`, `<OUTPUT_RO
 
 - Code in this repository is distributed under the project `LICENSE`.
 - Data access and usage involving CSD/CCDC resources must comply with their own license terms.
-- `mcd_master_index.csv` is provided for workflow indexing/alignment in this repository context; any redistribution or external reuse must be checked against upstream data and institutional policy requirements.
+- `MCD_full_version_20260605.csv` is provided for workflow indexing/alignment in this repository context; any redistribution or external reuse must be checked against upstream data and institutional policy requirements.
