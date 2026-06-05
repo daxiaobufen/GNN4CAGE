@@ -4,7 +4,7 @@
     "model_root": "models",
     "output_root": "outputs",
     "xyz_dir": "data/extracted/CSD_Molecule",
-    "label_csv": "data/labels/training_data_01.csv",
+    "label_csv": "training_data_01.csv",
     "inference_csv": "outputs/inference/DNNetBatchPredictions.csv",
     "dimenet_weights": "models/best_DimeNetplus.pth",
     "python_executable": "<PYTHON_EXECUTABLE>"

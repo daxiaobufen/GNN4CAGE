@@ -9,7 +9,6 @@ This folder contains the final minimal publishable package.
 - SECURITY.md
 - MCD_full_version_20260605.csv
 - training_data_01.csv
-- data/labels/training_data_01.csv
 - configs/config.json
 - scripts/csd_extractor.py
 - scripts/train_dimenet_schnet.ipynb

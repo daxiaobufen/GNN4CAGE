@@ -33,8 +33,8 @@ Runtime prerequisite:
 
 1. Fill local path placeholders in `configs/config.json`.
 2. Prepare training dataset files according to `docs/dataset_format.md`.
-   - The repository includes `training_data_01.csv` at the repository root and a working copy at `data/labels/training_data_01.csv`.
-   - The default working training label CSV is `data/labels/training_data_01.csv`.
+   - The repository includes `training_data_01.csv` at the repository root.
+   - If you use a separate workspace layout, place a working copy under `workspace/data/labels/training_data_01.csv` and update `configs/config.json` accordingly.
    - `training_data_01.csv` contains 7,749 structures, uses no header, and includes two columns: `Refcode` and `Label`.
    - In this released training set, all macrocyclic and cage structures are uniformly labeled as `1`.
    - Global inference refcode CSV is manually provided, one column, no header.
@@ -67,7 +67,7 @@ python scripts/tsne_pipeline.py
 7. (Optional) Run labeled evaluation:
 
 ```bash
-python scripts/dimenet_inference.py --mode eval --label-csv data/labels/training_data_01.csv --label-mode auto
+python scripts/dimenet_inference.py --mode eval --label-csv training_data_01.csv --label-mode auto
 ```
 
 ## Current Repository Structure
@@ -83,9 +83,6 @@ python scripts/dimenet_inference.py --mode eval --label-csv data/labels/training
 ├─ requirements.txt
 ├─ configs/
 │  └─ config.json
-├─ data/
-│  └─ labels/
-│     └─ training_data_01.csv
 ├─ docs/
 │  ├─ dataset_format.md
 │  └─ script_reference.md
@@ -104,7 +101,6 @@ Included:
 - core docs under `docs/`
 - public full-database file `MCD_full_version_20260605.csv`
 - public training dataset `training_data_01.csv`
-- working training label CSV `data/labels/training_data_01.csv`
 
 Not included:
 - `workspace/`
@@ -175,8 +171,8 @@ workspace/
 - Keep machine-specific paths only in config; do not hardcode them into scripts.
 - The training notebook reads label CSV + XYZ files; make sure those two paths are valid before training.
 - Keep one canonical XYZ folder for training/inference/t-SNE: `workspace/data/extracted/CSD_Molecule`.
-- Use `data/labels/training_data_01.csv` as the default working training label CSV.
-- Keep the repository-root `training_data_01.csv` as a public release copy of the same dataset.
+- Use the repository-root `training_data_01.csv` as the default release training label CSV.
+- If you work in a separate `workspace/`, place the working label CSV under `workspace/data/labels/training_data_01.csv`.
 - Use a one-column, no-header refcode CSV as global inference input.
 - Use the inference output file referenced by `paths.inference_csv` as the t-SNE input.
 - Recommended t-SNE input file: `workspace/outputs/inference/DNNetBatchPredictions.csv`
